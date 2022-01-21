@@ -42,106 +42,90 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateSearchJSON = void 0;
 var puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 var puppeteer_extra_plugin_stealth_1 = __importDefault(require("puppeteer-extra-plugin-stealth"));
-var user_agents_1 = __importDefault(require("user-agents"));
-var fs_1 = __importDefault(require("fs"));
+var DocumentType_1 = require("../../../models/DocumentType");
+var services_1 = require("../../services");
 var generateSearchJSON = function (products) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        console.log('Launching puppeteer... ');
-        puppeteer_extra_1.default
-            .use((0, puppeteer_extra_plugin_stealth_1.default)())
-            .launch({
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-infobars',
-                '--window-position=0,0',
-                '--ignore-certifcate-errors',
-                '--ignore-certifcate-errors-spki-list'
-            ],
-            ignoreHTTPSErrors: true,
-            headless: false
-        })
-            .then(function (instance) { return __awaiter(void 0, void 0, void 0, function () {
-            var browser;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        browser = instance;
-                        return [4 /*yield*/, browser.pages()
-                                .then(function (pages) { return __awaiter(void 0, void 0, void 0, function () {
-                                var page, finalSearchResult, i, nameProduct, formatedName, bulaUrl, fispqUrl, formatResult, finalDataResult;
-                                var _a;
-                                return __generator(this, function (_b) {
-                                    switch (_b.label) {
-                                        case 0:
-                                            page = pages[0];
-                                            finalSearchResult = [];
-                                            i = 0;
-                                            _b.label = 1;
-                                        case 1:
-                                            if (!(i < products.length)) return [3 /*break*/, 10];
-                                            nameProduct = products[i].NOME_PROD;
-                                            if (!nameProduct) return [3 /*break*/, 9];
-                                            formatedName = nameProduct.replace(' ', '+');
-                                            return [4 /*yield*/, page.setUserAgent(user_agents_1.default.toString())];
-                                        case 2:
-                                            _b.sent();
-                                            console.log("".concat(i + 1, " de ").concat(products.length, " - Searching for ").concat(nameProduct, " "));
-                                            return [4 /*yield*/, page.goto("https://duckduckgo.com/?q=".concat(formatedName, "+bula+pdf&kl=br-pt&k1=-1"))];
-                                        case 3:
-                                            _b.sent();
-                                            return [4 /*yield*/, page.waitForSelector('.result__body', { visible: true })];
-                                        case 4:
-                                            _b.sent();
-                                            return [4 /*yield*/, page.$$eval('a[data-testid="result-title-a"]', function (as) { return as.map(function (a) { return a.getAttribute('href'); }); })];
-                                        case 5:
-                                            bulaUrl = _b.sent();
-                                            return [4 /*yield*/, page.goto("https://duckduckgo.com/?q=".concat(formatedName, "+fispq+pdf&kl=br-pt&k1=-1"))];
-                                        case 6:
-                                            _b.sent();
-                                            return [4 /*yield*/, page.waitForSelector('.result__body', { visible: true })];
-                                        case 7:
-                                            _b.sent();
-                                            return [4 /*yield*/, page.$$eval('a[data-testid="result-title-a"]', function (as) { return as.map(function (a) { return a.getAttribute('href'); }); })];
-                                        case 8:
-                                            fispqUrl = _b.sent();
-                                            formatResult = {
-                                                cod: (_a = products[i]) === null || _a === void 0 ? void 0 : _a.COD_PROD,
-                                                name: nameProduct,
-                                                bulaSearchResult: bulaUrl[0],
-                                                fispqSearchResult: fispqUrl[0]
-                                            };
-                                            finalSearchResult.push(formatResult);
-                                            _b.label = 9;
-                                        case 9:
-                                            i++;
-                                            return [3 /*break*/, 1];
-                                        case 10:
-                                            finalDataResult = JSON.stringify({ finalSearchResult: finalSearchResult });
-                                            fs_1.default.writeFile('finalSearchResult.json', finalDataResult, function (err) {
-                                                if (err) {
-                                                    throw err;
+        switch (_a.label) {
+            case 0:
+                console.log('Launching puppeteer... ');
+                return [4 /*yield*/, puppeteer_extra_1.default
+                        .use((0, puppeteer_extra_plugin_stealth_1.default)())
+                        .launch({
+                        args: [
+                            '--no-sandbox',
+                            '--disable-setuid-sandbox',
+                            '--disable-infobars',
+                            '--window-position=0,0',
+                            '--ignore-certifcate-errors',
+                            '--ignore-certifcate-errors-spki-list'
+                        ],
+                        ignoreHTTPSErrors: true,
+                        headless: false
+                    })
+                        .then(function (instance) { return __awaiter(void 0, void 0, void 0, function () {
+                        var browser;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    browser = instance;
+                                    return [4 /*yield*/, browser.pages()
+                                            .then(function (pages) { return __awaiter(void 0, void 0, void 0, function () {
+                                            var page, searchResults, i, productName, bulaUrl, fispqUrl, formatResult;
+                                            var _a;
+                                            return __generator(this, function (_b) {
+                                                switch (_b.label) {
+                                                    case 0:
+                                                        page = pages[0];
+                                                        searchResults = [];
+                                                        i = 0;
+                                                        _b.label = 1;
+                                                    case 1:
+                                                        if (!(i < 3) /* products.length */) return [3 /*break*/, 5];
+                                                        productName = products[i].NOME_PROD;
+                                                        if (!productName) return [3 /*break*/, 4];
+                                                        console.log("".concat(i + 1, " de ").concat(products.length, " - Searching for ").concat(productName, " "));
+                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.BULA)];
+                                                    case 2:
+                                                        bulaUrl = _b.sent();
+                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.FISPQ)];
+                                                    case 3:
+                                                        fispqUrl = _b.sent();
+                                                        formatResult = {
+                                                            cod: (_a = products[i]) === null || _a === void 0 ? void 0 : _a.COD_PROD,
+                                                            name: productName,
+                                                            bulaSearchResult: bulaUrl[0],
+                                                            fispqSearchResult: fispqUrl[0]
+                                                        };
+                                                        searchResults.push(formatResult);
+                                                        _b.label = 4;
+                                                    case 4:
+                                                        i++;
+                                                        return [3 /*break*/, 1];
+                                                    case 5: return [4 /*yield*/, (0, services_1.generateSearchResultJSON)(searchResults)];
+                                                    case 6:
+                                                        _b.sent();
+                                                        browser.close();
+                                                        return [2 /*return*/];
                                                 }
-                                                console.log('JSON data is saved.');
                                             });
-                                            browser.close();
-                                            return [2 /*return*/];
-                                    }
-                                });
-                            }); })
-                                .catch(function (error) {
-                                console.log('Something went wrong during browser.pages: ', error);
-                            })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        }); })
-            .catch(function (error) {
-            console.log('Something went wrong during puppeteer.launch: ', error);
-        });
-        return [2 /*return*/];
+                                        }); })
+                                            .catch(function (error) {
+                                            console.log('Something went wrong during browser.pages: ', error);
+                                        })];
+                                case 1:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); })
+                        .catch(function (error) {
+                        console.log('Something went wrong during puppeteer.launch: ', error);
+                    })];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
     });
 }); };
 exports.generateSearchJSON = generateSearchJSON;

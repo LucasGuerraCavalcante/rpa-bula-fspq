@@ -41,76 +41,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.downloadPDFs = void 0;
 var fs_1 = __importDefault(require("fs"));
-var http_1 = __importDefault(require("http"));
-var https_1 = __importDefault(require("https"));
+var DocumentType_1 = require("../../../models/DocumentType");
+var services_1 = require("../../services");
 var downloadPDFs = function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         fs_1.default.readFile('./finalSearchResult.json', 'utf8', function (err, data) { return __awaiter(void 0, void 0, void 0, function () {
-            var dataset, finalSearchResult_1, _loop_1, i;
-            var _a, _b;
-            return __generator(this, function (_c) {
-                if (err) {
-                    console.log("Error reading file from disk: ".concat(err));
+            var dataset, finalSearchResult, i, searchResult;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!err) return [3 /*break*/, 1];
+                        console.log("Error reading file from disk: ".concat(err));
+                        return [3 /*break*/, 6];
+                    case 1:
+                        dataset = JSON.parse(data);
+                        finalSearchResult = dataset.finalSearchResult;
+                        i = 0;
+                        _a.label = 2;
+                    case 2:
+                        if (!(i < 3) /* finalSearchResult.length */) return [3 /*break*/, 6];
+                        searchResult = finalSearchResult[i];
+                        return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        i++;
+                        return [3 /*break*/, 2];
+                    case 6: return [2 /*return*/];
                 }
-                else {
-                    dataset = JSON.parse(data);
-                    finalSearchResult_1 = dataset.finalSearchResult;
-                    _loop_1 = function (i) {
-                        var searchResult = finalSearchResult_1[i];
-                        if ((_a = searchResult.bulaSearchResult) === null || _a === void 0 ? void 0 : _a.includes('.pdf')) {
-                            var file_1 = fs_1.default.createWriteStream("./data/pdfsBulls/".concat(searchResult.cod, "_1.pdf"));
-                            if (searchResult.bulaSearchResult.includes('https://')) {
-                                https_1.default.get(searchResult.bulaSearchResult, function (response) {
-                                    response.pipe(file_1);
-                                }).on('error', function (err) {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Starting download process for: Bull ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                                }).on('finish', function () {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download process finished for: Bull ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                                });
-                            }
-                            else {
-                                http_1.default.get(searchResult.bulaSearchResult, function (response) {
-                                    response.pipe(file_1);
-                                }).on('error', function (err) {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download failed for: Bull ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                                }).on('finish', function () {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download process finished for: Bull ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                                });
-                            }
-                        }
-                        else {
-                            console.log("Cannot download PDF for ".concat(searchResult.name, ": Bull .pdf URL not available"));
-                        }
-                        if ((_b = searchResult.fispqSearchResult) === null || _b === void 0 ? void 0 : _b.includes('.pdf')) {
-                            var file_2 = fs_1.default.createWriteStream("./data/pdfsFispqs/".concat(searchResult.cod, "_2.pdf"));
-                            if (searchResult.fispqSearchResult.includes('https://')) {
-                                https_1.default.get(searchResult.fispqSearchResult, function (response) {
-                                    response.pipe(file_2);
-                                }).on('error', function (err) {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download failed for: FISPQ ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                                }).on('finish', function () {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download process finished for: FISPQ ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                                });
-                            }
-                            else {
-                                http_1.default.get(searchResult.fispqSearchResult, function (response) {
-                                    response.pipe(file_2);
-                                }).on('error', function (err) {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Starting download process for: FISPQ ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                                }).on('finish', function () {
-                                    console.log("".concat(i + 1, " of ").concat(finalSearchResult_1.length, " - Download process finished for: FISPQ ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                                });
-                            }
-                        }
-                        else {
-                            console.log("Cannot downloaded PDF for ".concat(searchResult.name, ": FISPQ .pdf URL not available"));
-                        }
-                    };
-                    for (i = 0; i < finalSearchResult_1.length; i++) {
-                        _loop_1(i);
-                    }
-                }
-                return [2 /*return*/];
             });
         }); });
         return [2 /*return*/];
