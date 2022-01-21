@@ -1,11 +1,13 @@
-import { Product } from '../../../models/xlsxData'
 import puppeteer from 'puppeteer-extra'
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 
 import userAgent from 'user-agents'
 import fs from 'fs'
 
-export const generateAllBullsAndFisspqSearchJSON = async (products: Product[]) => {
+import { Product } from '../../../models/Product'
+import { SearchResult } from '../../../models/SearchResult'
+
+export const generateSearchJSON = async (products: Product[]) => {
   console.log('Launching puppeteer... ')
 
   puppeteer
@@ -28,9 +30,9 @@ export const generateAllBullsAndFisspqSearchJSON = async (products: Product[]) =
       await browser.pages()
         .then(async pages => {
           const [page] = pages
-          const finalSearchResult: any = []
+          const finalSearchResult: SearchResult[] = []
 
-          for (let i = 0; i < 3; i++) {
+          for (let i = 0; i < products.length; i++) {
             const nameProduct = products[i].NOME_PROD
 
             if (nameProduct) {
@@ -48,7 +50,7 @@ export const generateAllBullsAndFisspqSearchJSON = async (products: Product[]) =
               await page.waitForSelector('.result__body', { visible: true })
               const fispqUrl = await page.$$eval('a[data-testid="result-title-a"]', as => as.map(a => a.getAttribute('href')))
 
-              const formatResult = {
+              const formatResult: SearchResult = {
                 cod: products[i]?.COD_PROD,
                 name: nameProduct,
                 bulaSearchResult: bulaUrl[0],

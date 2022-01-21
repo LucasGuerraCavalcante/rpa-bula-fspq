@@ -1,5 +1,5 @@
 import reader from 'xlsx'
-import { Product } from '../../models/xlsxData'
+import { Product } from '../../models/Product'
 
 export const formatDataSet = (file: reader.WorkBook) => {
   const sheets = file.SheetNames

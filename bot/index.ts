@@ -1,6 +1,8 @@
-import { Product } from '../models/xlsxData'
-import { generateAllBullsAndFisspqSearchJSON } from './methods/generateAllBullsAndFisspqSearchJSON'
+import { Product } from '../models/Product'
+import { downloadPDFs } from './methods/downloadPDFs'
+import { generateSearchJSON } from './methods/generateSearchJSON'
 
 export const bot = {
-  generateAllBullsAndFisspqSearchJSON: (products: Product[]) => generateAllBullsAndFisspqSearchJSON(products)
+  generateSearchJSON: (products: Product[]) => generateSearchJSON(products),
+  downloadPDFs: () => downloadPDFs()
 }
