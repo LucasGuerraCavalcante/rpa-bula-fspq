@@ -61,7 +61,7 @@ var generateSearchJSON = function (products, isTest) { return __awaiter(void 0, 
                             '--ignore-certifcate-errors-spki-list'
                         ],
                         ignoreHTTPSErrors: true,
-                        headless: true
+                        headless: false
                     })
                         .then(function (instance) { return __awaiter(void 0, void 0, void 0, function () {
                         var browser;

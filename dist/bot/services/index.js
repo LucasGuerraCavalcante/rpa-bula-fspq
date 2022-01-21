@@ -48,7 +48,7 @@ var constants_1 = require("../../constants");
 var selectToWait = '.result__body';
 var selectorResult = 'a[data-testid="result-title-a"]';
 var getUrlFromDuckDuckGoSearch = function (page, productName, documentToSearch) { return __awaiter(void 0, void 0, void 0, function () {
-    var formatedName, searchUrl, resultURL;
+    var formatedName, searchUrl, err_1, resultURL;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -57,11 +57,25 @@ var getUrlFromDuckDuckGoSearch = function (page, productName, documentToSearch) 
                 return [4 /*yield*/, page.goto(searchUrl)];
             case 1:
                 _a.sent();
-                return [4 /*yield*/, page.waitForSelector(selectToWait, { visible: true })];
+                _a.label = 2;
             case 2:
-                _a.sent();
-                return [4 /*yield*/, page.$$eval(selectorResult, function (as) { return as.map(function (a) { return a.getAttribute('href'); }); })];
+                _a.trys.push([2, 4, , 7]);
+                return [4 /*yield*/, page.waitForSelector(selectToWait, { visible: true })];
             case 3:
+                _a.sent();
+                return [3 /*break*/, 7];
+            case 4:
+                err_1 = _a.sent();
+                console.log("Something went wrong while acessing ".concat(searchUrl, ": ."), err_1);
+                return [4 /*yield*/, page.reload()];
+            case 5:
+                _a.sent();
+                return [4 /*yield*/, page.waitForSelector(selectToWait, { visible: true })];
+            case 6:
+                _a.sent();
+                return [3 /*break*/, 7];
+            case 7: return [4 /*yield*/, page.$$eval(selectorResult, function (as) { return as.map(function (a) { return a.getAttribute('href'); }); })];
+            case 8:
                 resultURL = _a.sent();
                 return [2 /*return*/, resultURL];
         }
@@ -74,7 +88,7 @@ var generateSearchResultJSON = function (finalSearchResult) { return __awaiter(v
         finalDataResult = JSON.stringify({ finalSearchResult: finalSearchResult });
         fs_1.default.writeFile('searchResult.json', finalDataResult, function (err) {
             if (err) {
-                console.log('Something went wrong during writing the JSON result file.', err);
+                console.log('Something went wrong while writing the JSON result file.', err);
             }
             console.log('JSON data is saved.');
         });

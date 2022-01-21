@@ -22,7 +22,7 @@ export const generateSearchJSON = async (products: Product[], isTest: boolean | 
         '--ignore-certifcate-errors-spki-list'
       ],
       ignoreHTTPSErrors: true,
-      headless: true
+      headless: false
     })
     .then(async instance => {
       const browser = instance

@@ -15,7 +15,14 @@ export const getUrlFromDuckDuckGoSearch = async (page: puppeteer.Page, productNa
   const searchUrl = `https://duckduckgo.com/?q=${formatedName}+${documentToSearch}+pdf&kl=br-pt&k1=-1`
 
   await page.goto(searchUrl)
-  await page.waitForSelector(selectToWait, { visible: true })
+
+  try {
+    await page.waitForSelector(selectToWait, { visible: true })
+  } catch (err) {
+    console.log(`Something went wrong while acessing ${searchUrl}: .`, err)
+    await page.reload()
+    await page.waitForSelector(selectToWait, { visible: true })
+  }
 
   const resultURL = await page.$$eval(selectorResult, (as: Element[]) => as.map(a => a.getAttribute('href')))
 
@@ -27,7 +34,7 @@ export const generateSearchResultJSON = async (finalSearchResult: SearchResult[]
 
   fs.writeFile('searchResult.json', finalDataResult, (err: any) => {
     if (err) {
-      console.log('Something went wrong during writing the JSON result file.', err)
+      console.log('Something went wrong while writing the JSON result file.', err)
     }
     console.log('JSON data is saved.')
   })
