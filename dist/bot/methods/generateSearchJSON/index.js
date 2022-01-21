@@ -44,7 +44,7 @@ var puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
 var puppeteer_extra_plugin_stealth_1 = __importDefault(require("puppeteer-extra-plugin-stealth"));
 var DocumentType_1 = require("../../../models/DocumentType");
 var services_1 = require("../../services");
-var generateSearchJSON = function (products) { return __awaiter(void 0, void 0, void 0, function () {
+var generateSearchJSON = function (products, isTest) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -61,7 +61,7 @@ var generateSearchJSON = function (products) { return __awaiter(void 0, void 0, 
                             '--ignore-certifcate-errors-spki-list'
                         ],
                         ignoreHTTPSErrors: true,
-                        headless: false
+                        headless: true
                     })
                         .then(function (instance) { return __awaiter(void 0, void 0, void 0, function () {
                         var browser;
@@ -71,20 +71,21 @@ var generateSearchJSON = function (products) { return __awaiter(void 0, void 0, 
                                     browser = instance;
                                     return [4 /*yield*/, browser.pages()
                                             .then(function (pages) { return __awaiter(void 0, void 0, void 0, function () {
-                                            var page, searchResults, i, productName, bulaUrl, fispqUrl, formatResult;
+                                            var page, searchResults, itemToProcess, i, productName, bulaUrl, fispqUrl, formatResult;
                                             var _a;
                                             return __generator(this, function (_b) {
                                                 switch (_b.label) {
                                                     case 0:
                                                         page = pages[0];
                                                         searchResults = [];
+                                                        itemToProcess = isTest ? 3 : products.length;
                                                         i = 0;
                                                         _b.label = 1;
                                                     case 1:
-                                                        if (!(i < 3) /* products.length */) return [3 /*break*/, 5];
+                                                        if (!(i < itemToProcess)) return [3 /*break*/, 5];
                                                         productName = products[i].NOME_PROD;
                                                         if (!productName) return [3 /*break*/, 4];
-                                                        console.log("".concat(i + 1, " de ").concat(products.length, " - Searching for ").concat(productName, " "));
+                                                        console.log("".concat(i + 1, " de ").concat(itemToProcess, " - Searching for ").concat(productName, " "));
                                                         return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.BULA)];
                                                     case 2:
                                                         bulaUrl = _b.sent();
@@ -105,7 +106,9 @@ var generateSearchJSON = function (products) { return __awaiter(void 0, void 0, 
                                                     case 5: return [4 /*yield*/, (0, services_1.generateSearchResultJSON)(searchResults)];
                                                     case 6:
                                                         _b.sent();
-                                                        browser.close();
+                                                        return [4 /*yield*/, browser.close()];
+                                                    case 7:
+                                                        _b.sent();
                                                         return [2 /*return*/];
                                                 }
                                             });

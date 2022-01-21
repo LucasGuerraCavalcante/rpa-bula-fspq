@@ -5,6 +5,7 @@ import https from 'https'
 
 import { DocumentType } from '../../models/DocumentType'
 import { SearchResult } from '../../models/SearchResult'
+import { PDFsFolderPath } from '../../constants'
 
 const selectToWait = '.result__body'
 const selectorResult = 'a[data-testid="result-title-a"]'
@@ -32,30 +33,32 @@ export const generateSearchResultJSON = async (finalSearchResult: SearchResult[]
   })
 }
 
-export const downloadPDF = async (searchResult: SearchResult, documentType: DocumentType) => {
-  const path = documentType === DocumentType.BULA ? './data/bulas' : './data/fispqs'
+export const downloadSearchResultPDF = async (searchResult: SearchResult, documentType: DocumentType) => {
   const fileName = documentType === DocumentType.BULA ? `${searchResult.cod}_1.pdf` : `${searchResult.cod}_2.pdf`
-
-  const fileStream = fs.createWriteStream(`${path}/${fileName}`)
-
   const pdfURL = documentType === DocumentType.BULA ? searchResult.bulaSearchResult : searchResult.fispqSearchResult
+
+  const fileStream = fs.createWriteStream(`${PDFsFolderPath}/${fileName}`)
 
   if (pdfURL && pdfURL.includes('.pdf')) {
     if (pdfURL.includes('https://')) {
-      https.get(pdfURL, (response) => {
-        response.pipe(fileStream)
-      }).on('error', (err) => {
-        console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err)
-      }).on('finish', () => {
-        console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+      return new Promise((resolve) => {
+        https.get(pdfURL, (response) => {
+          resolve(response.pipe(fileStream))
+        }).on('error', (err) => {
+          console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err)
+        }).on('finish', () => {
+          console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+        })
       })
     } else {
-      http.get(pdfURL, (response) => {
-        response.pipe(fileStream)
-      }).on('error', (err) => {
-        console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err)
-      }).on('finish', () => {
-        console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+      return new Promise((resolve) => {
+        http.get(pdfURL, (response) => {
+          resolve(response.pipe(fileStream))
+        }).on('error', (err) => {
+          console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err)
+        }).on('finish', () => {
+          console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+        })
       })
     }
   } else {

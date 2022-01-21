@@ -39,11 +39,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadPDF = exports.generateSearchResultJSON = exports.getUrlFromDuckDuckGoSearch = void 0;
+exports.downloadSearchResultPDF = exports.generateSearchResultJSON = exports.getUrlFromDuckDuckGoSearch = void 0;
 var fs_1 = __importDefault(require("fs"));
 var http_1 = __importDefault(require("http"));
 var https_1 = __importDefault(require("https"));
 var DocumentType_1 = require("../../models/DocumentType");
+var constants_1 = require("../../constants");
 var selectToWait = '.result__body';
 var selectorResult = 'a[data-testid="result-title-a"]';
 var getUrlFromDuckDuckGoSearch = function (page, productName, documentToSearch) { return __awaiter(void 0, void 0, void 0, function () {
@@ -73,7 +74,7 @@ var generateSearchResultJSON = function (finalSearchResult) { return __awaiter(v
         finalDataResult = JSON.stringify({ finalSearchResult: finalSearchResult });
         fs_1.default.writeFile('searchResult.json', finalDataResult, function (err) {
             if (err) {
-                throw err;
+                console.log('Something went wrong during writing the JSON result file.', err);
             }
             console.log('JSON data is saved.');
         });
@@ -81,31 +82,34 @@ var generateSearchResultJSON = function (finalSearchResult) { return __awaiter(v
     });
 }); };
 exports.generateSearchResultJSON = generateSearchResultJSON;
-var downloadPDF = function (searchResult, documentType) { return __awaiter(void 0, void 0, void 0, function () {
-    var path, fileName, fileStream, pdfURL;
+var downloadSearchResultPDF = function (searchResult, documentType) { return __awaiter(void 0, void 0, void 0, function () {
+    var fileName, pdfURL, fileStream;
     return __generator(this, function (_a) {
-        path = documentType === DocumentType_1.DocumentType.BULA ? './data/bulas' : './data/fispqs';
         fileName = documentType === DocumentType_1.DocumentType.BULA ? "".concat(searchResult.cod, "_1.pdf") : "".concat(searchResult.cod, "_2.pdf");
-        fileStream = fs_1.default.createWriteStream("".concat(path, "/").concat(fileName));
         pdfURL = documentType === DocumentType_1.DocumentType.BULA ? searchResult.bulaSearchResult : searchResult.fispqSearchResult;
+        fileStream = fs_1.default.createWriteStream("".concat(constants_1.PDFsFolderPath, "/").concat(fileName));
         if (pdfURL && pdfURL.includes('.pdf')) {
             if (pdfURL.includes('https://')) {
-                https_1.default.get(pdfURL, function (response) {
-                    response.pipe(fileStream);
-                }).on('error', function (err) {
-                    console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                }).on('finish', function () {
-                    console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                });
+                return [2 /*return*/, new Promise(function (resolve) {
+                        https_1.default.get(pdfURL, function (response) {
+                            resolve(response.pipe(fileStream));
+                        }).on('error', function (err) {
+                            console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
+                        }).on('finish', function () {
+                            console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
+                        });
+                    })];
             }
             else {
-                http_1.default.get(pdfURL, function (response) {
-                    response.pipe(fileStream);
-                }).on('error', function (err) {
-                    console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
-                }).on('finish', function () {
-                    console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
-                });
+                return [2 /*return*/, new Promise(function (resolve) {
+                        http_1.default.get(pdfURL, function (response) {
+                            resolve(response.pipe(fileStream));
+                        }).on('error', function (err) {
+                            console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
+                        }).on('finish', function () {
+                            console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
+                        });
+                    })];
             }
         }
         else {
@@ -114,4 +118,4 @@ var downloadPDF = function (searchResult, documentType) { return __awaiter(void 
         return [2 /*return*/];
     });
 }); };
-exports.downloadPDF = downloadPDF;
+exports.downloadSearchResultPDF = downloadSearchResultPDF;

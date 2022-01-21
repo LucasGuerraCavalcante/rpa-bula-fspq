@@ -39,11 +39,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadPDFs = void 0;
+exports.downloadSearchResultPDFs = void 0;
 var fs_1 = __importDefault(require("fs"));
 var DocumentType_1 = require("../../../models/DocumentType");
 var services_1 = require("../../services");
-var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, function () {
+var downloadSearchResultPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, fs_1.default.promises.readFile('./searchResult.json', 'utf8')
@@ -60,10 +60,10 @@ var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, 
                             case 1:
                                 if (!(i < itemToProcess)) return [3 /*break*/, 5];
                                 searchResult = finalSearchResult[i];
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
+                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
                             case 2:
                                 _a.sent();
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
+                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
                             case 3:
                                 _a.sent();
                                 _a.label = 4;
@@ -83,4 +83,4 @@ var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, 
         }
     });
 }); };
-exports.downloadPDFs = downloadPDFs;
+exports.downloadSearchResultPDFs = downloadSearchResultPDFs;

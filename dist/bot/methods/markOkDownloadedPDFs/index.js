@@ -39,43 +39,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadPDFs = void 0;
+exports.markOkDownloadedPDFs = void 0;
 var fs_1 = __importDefault(require("fs"));
-var DocumentType_1 = require("../../../models/DocumentType");
-var services_1 = require("../../services");
-var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, function () {
+var constants_1 = require("../../../constants");
+var markOkDownloadedPDFs = function (products, isTest) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, fs_1.default.promises.readFile('./searchResult.json', 'utf8')
-                    .then(function (data) { return __awaiter(void 0, void 0, void 0, function () {
-                    var dataset, finalSearchResult, itemToProcess, i, searchResult;
+            case 0: return [4 /*yield*/, fs_1.default.promises.readdir(constants_1.PDFsFolderPath)
+                    .then(function (files) { return __awaiter(void 0, void 0, void 0, function () {
+                    var itemToProcess, _loop_1, i;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                dataset = JSON.parse(data);
-                                finalSearchResult = dataset.finalSearchResult;
-                                itemToProcess = isTest ? 3 : finalSearchResult.length;
+                                itemToProcess = isTest ? 6 : files.length;
+                                _loop_1 = function (i) {
+                                    var file, stats, fileSizeInBytes;
+                                    return __generator(this, function (_b) {
+                                        switch (_b.label) {
+                                            case 0:
+                                                file = files[i];
+                                                stats = fs_1.default.statSync("".concat(constants_1.PDFsFolderPath, "/").concat(file));
+                                                fileSizeInBytes = stats.size;
+                                                if (!(fileSizeInBytes < 100000)) return [3 /*break*/, 2];
+                                                console.error("".concat(file, " has less than 1MB (").concat(fileSizeInBytes, "B) so its probably a corrupted file"));
+                                                return [4 /*yield*/, fs_1.default.promises.unlink("".concat(constants_1.PDFsFolderPath, "/").concat(file))
+                                                        .then(function () {
+                                                        console.error("".concat(file, " was deleted"));
+                                                    })
+                                                        .catch(function (err) {
+                                                        console.log("Something went wrong while deleting ".concat(file), err);
+                                                    })];
+                                            case 1:
+                                                _b.sent();
+                                                return [3 /*break*/, 3];
+                                            case 2:
+                                                console.log(products);
+                                                _b.label = 3;
+                                            case 3: return [2 /*return*/];
+                                        }
+                                    });
+                                };
                                 i = 0;
                                 _a.label = 1;
                             case 1:
-                                if (!(i < itemToProcess)) return [3 /*break*/, 5];
-                                searchResult = finalSearchResult[i];
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
+                                if (!(i < itemToProcess)) return [3 /*break*/, 4];
+                                return [5 /*yield**/, _loop_1(i)];
                             case 2:
                                 _a.sent();
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
+                                _a.label = 3;
                             case 3:
-                                _a.sent();
-                                _a.label = 4;
-                            case 4:
                                 i++;
                                 return [3 /*break*/, 1];
-                            case 5: return [2 /*return*/];
+                            case 4: return [2 /*return*/];
                         }
                     });
                 }); })
                     .catch(function (err) {
-                    console.log("Error reading file from disk: ".concat(err));
+                    console.error("Could not list ".concat(constants_1.PDFsFolderPath, ": "), err);
                 })];
             case 1:
                 _a.sent();
@@ -83,4 +103,4 @@ var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, 
         }
     });
 }); };
-exports.downloadPDFs = downloadPDFs;
+exports.markOkDownloadedPDFs = markOkDownloadedPDFs;

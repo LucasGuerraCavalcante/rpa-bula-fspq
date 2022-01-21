@@ -39,48 +39,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadPDFs = void 0;
+exports.exportDownloadedFiles = void 0;
 var fs_1 = __importDefault(require("fs"));
-var DocumentType_1 = require("../../../models/DocumentType");
-var services_1 = require("../../services");
-var downloadPDFs = function (isTest) { return __awaiter(void 0, void 0, void 0, function () {
+var archiver_1 = __importDefault(require("archiver"));
+var constants_1 = require("../../../constants");
+var exportDownloadedFiles = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var archive, output;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, fs_1.default.promises.readFile('./searchResult.json', 'utf8')
-                    .then(function (data) { return __awaiter(void 0, void 0, void 0, function () {
-                    var dataset, finalSearchResult, itemToProcess, i, searchResult;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                dataset = JSON.parse(data);
-                                finalSearchResult = dataset.finalSearchResult;
-                                itemToProcess = isTest ? 3 : finalSearchResult.length;
-                                i = 0;
-                                _a.label = 1;
-                            case 1:
-                                if (!(i < itemToProcess)) return [3 /*break*/, 5];
-                                searchResult = finalSearchResult[i];
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
-                            case 2:
-                                _a.sent();
-                                return [4 /*yield*/, (0, services_1.downloadPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
-                            case 3:
-                                _a.sent();
-                                _a.label = 4;
-                            case 4:
-                                i++;
-                                return [3 /*break*/, 1];
-                            case 5: return [2 /*return*/];
-                        }
-                    });
-                }); })
-                    .catch(function (err) {
-                    console.log("Error reading file from disk: ".concat(err));
-                })];
+            case 0:
+                archive = archiver_1.default.create('zip', {});
+                output = fs_1.default.createWriteStream('./data/pdfs.zip');
+                archive.pipe(output);
+                return [4 /*yield*/, archive
+                        .directory(constants_1.PDFsFolderPath, '')
+                        .finalize()
+                        .then(function () {
+                        console.log('Files exported on ./data/pdfs.zip');
+                    }).catch(function (err) {
+                        console.log('Something went wrong while creating the zip file', err);
+                    })];
             case 1:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); };
-exports.downloadPDFs = downloadPDFs;
+exports.exportDownloadedFiles = exportDownloadedFiles;

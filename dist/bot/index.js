@@ -37,18 +37,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.bot = void 0;
-var downloadPDFs_1 = require("./methods/downloadPDFs");
+var downloadSearchResultPDFs_1 = require("./methods/downloadSearchResultPDFs");
 var generateSearchJSON_1 = require("./methods/generateSearchJSON");
+var deleteCorruptedFiles_1 = require("./methods/deleteCorruptedFiles");
+var exportDownloadedFiles_1 = require("./methods/exportDownloadedFiles");
 exports.bot = {
-    generateSearchJSON: function (products) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+    generateSearchJSON: function (products, isTest) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, generateSearchJSON_1.generateSearchJSON)(products)];
+            case 0: return [4 /*yield*/, (0, generateSearchJSON_1.generateSearchJSON)(products, isTest)];
             case 1: return [2 /*return*/, _a.sent()];
         }
     }); }); },
-    downloadPDFs: function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+    downloadSearchResultPDFs: function (isTest) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, (0, downloadPDFs_1.downloadPDFs)()];
+            case 0: return [4 /*yield*/, (0, downloadSearchResultPDFs_1.downloadSearchResultPDFs)(isTest)];
+            case 1: return [2 /*return*/, _a.sent()];
+        }
+    }); }); },
+    deleteCorruptedFiles: function (isTest) { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, (0, deleteCorruptedFiles_1.deleteCorruptedFiles)(isTest)];
+            case 1: return [2 /*return*/, _a.sent()];
+        }
+    }); }); },
+    exportDownloadedFiles: function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, (0, exportDownloadedFiles_1.exportDownloadedFiles)()];
             case 1: return [2 /*return*/, _a.sent()];
         }
     }); }); }

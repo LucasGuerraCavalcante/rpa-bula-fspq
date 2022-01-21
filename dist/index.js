@@ -40,27 +40,41 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var xlsx_1 = __importDefault(require("xlsx"));
+var readline_sync_1 = __importDefault(require("readline-sync"));
 var bot_1 = require("./bot");
 var formatDataSet_1 = require("./utils/formatDataSet");
-var readline_sync_1 = __importDefault(require("readline-sync"));
 var file = xlsx_1.default.readFile('./data/Produto_BULA_FISPQ.xlsx');
 var products = (0, formatDataSet_1.formatDataSet)(file);
 var runBot = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var isTest;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                isTest = readline_sync_1.default.keyInYN('Are you just testing?: ');
                 if (!readline_sync_1.default.keyInYN('Generate a new search result JSON file?: ')) return [3 /*break*/, 2];
-                return [4 /*yield*/, bot_1.bot.generateSearchJSON(products)];
+                return [4 /*yield*/, bot_1.bot.generateSearchJSON(products, isTest)];
             case 1:
                 _a.sent();
                 _a.label = 2;
             case 2:
                 if (!readline_sync_1.default.keyInYN('Download PDFs files?: ')) return [3 /*break*/, 4];
-                return [4 /*yield*/, bot_1.bot.downloadPDFs()];
+                return [4 /*yield*/, bot_1.bot.downloadSearchResultPDFs(isTest)];
             case 3:
                 _a.sent();
                 _a.label = 4;
-            case 4: return [2 /*return*/];
+            case 4:
+                if (!readline_sync_1.default.keyInYN('Verify corrupted files and delete them?: ')) return [3 /*break*/, 6];
+                return [4 /*yield*/, bot_1.bot.deleteCorruptedFiles(isTest)];
+            case 5:
+                _a.sent();
+                _a.label = 6;
+            case 6:
+                if (!readline_sync_1.default.keyInYN('Export downloaded files (.zip)?: ')) return [3 /*break*/, 8];
+                return [4 /*yield*/, bot_1.bot.exportDownloadedFiles()];
+            case 7:
+                _a.sent();
+                _a.label = 8;
+            case 8: return [2 /*return*/];
         }
     });
 }); };

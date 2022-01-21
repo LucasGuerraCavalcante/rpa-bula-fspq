@@ -7,7 +7,7 @@ import { DocumentType } from '../../../models/DocumentType'
 
 import { generateSearchResultJSON, getUrlFromDuckDuckGoSearch } from '../../services'
 
-export const generateSearchJSON = async (products: Product[]) => {
+export const generateSearchJSON = async (products: Product[], isTest: boolean | string) => {
   console.log('Launching puppeteer... ')
 
   await puppeteer
@@ -22,7 +22,7 @@ export const generateSearchJSON = async (products: Product[]) => {
         '--ignore-certifcate-errors-spki-list'
       ],
       ignoreHTTPSErrors: true,
-      headless: false
+      headless: true
     })
     .then(async instance => {
       const browser = instance
@@ -32,11 +32,13 @@ export const generateSearchJSON = async (products: Product[]) => {
           const [page] = pages
           const searchResults: SearchResult[] = []
 
-          for (let i = 0; i < 3/* products.length */; i++) {
+          const itemToProcess = isTest ? 3 : products.length
+
+          for (let i = 0; i < itemToProcess; i++) {
             const productName = products[i].NOME_PROD
 
             if (productName) {
-              console.log(`${i + 1} de ${products.length} - Searching for ${productName} `)
+              console.log(`${i + 1} de ${itemToProcess} - Searching for ${productName} `)
 
               const bulaUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.BULA)
               const fispqUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.FISPQ)
