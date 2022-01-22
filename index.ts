@@ -31,6 +31,8 @@ const runBot = async () => {
   /* if (readlineSync.keyInYN('Mark downloaded PDFs as "ok"?: ')) {
     await bot.markOkDownloadedPDFs(isTest)
   } */
+
+  process.exit(0)
 }
 
 runBot()

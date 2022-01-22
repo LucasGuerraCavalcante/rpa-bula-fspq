@@ -49,16 +49,20 @@ export const downloadSearchResultPDF = async (searchResult: SearchResult, docume
   if (pdfURL && pdfURL.includes('.pdf')) {
     if (pdfURL.includes('https://')) {
       return new Promise((resolve) => {
+        console.log(`Starting download for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+
         https.get(pdfURL, (response) => {
-          resolve(response.pipe(fileStream))
+          response.pipe(fileStream)
         }).on('error', (err) => {
-          console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err)
+          resolve(console.log(`Download failed for: ${documentType} ${searchResult.cod}  ${searchResult.name}: `, err))
         }).on('finish', () => {
-          console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+          resolve(console.log(`Download process finished for: ${documentType} ${searchResult.cod}  ${searchResult.name}`))
         })
       })
     } else {
       return new Promise((resolve) => {
+        console.log(`Starting download for: ${documentType} ${searchResult.cod}  ${searchResult.name}`)
+
         http.get(pdfURL, (response) => {
           resolve(response.pipe(fileStream))
         }).on('error', (err) => {

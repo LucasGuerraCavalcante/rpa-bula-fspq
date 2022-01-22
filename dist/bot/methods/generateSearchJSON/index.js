@@ -71,27 +71,30 @@ var generateSearchJSON = function (products, isTest) { return __awaiter(void 0, 
                                     browser = instance;
                                     return [4 /*yield*/, browser.pages()
                                             .then(function (pages) { return __awaiter(void 0, void 0, void 0, function () {
-                                            var page, searchResults, itemToProcess, i, productName, bulaUrl, fispqUrl, formatResult;
-                                            var _a;
-                                            return __generator(this, function (_b) {
-                                                switch (_b.label) {
+                                            var page, searchResults, itemToProcess, i, productName, bulaUrl, fispqUrl, formatResult, err_1, formatResult;
+                                            var _a, _b;
+                                            return __generator(this, function (_c) {
+                                                switch (_c.label) {
                                                     case 0:
                                                         page = pages[0];
                                                         searchResults = [];
                                                         itemToProcess = isTest ? 3 : products.length;
                                                         i = 0;
-                                                        _b.label = 1;
+                                                        _c.label = 1;
                                                     case 1:
-                                                        if (!(i < itemToProcess)) return [3 /*break*/, 5];
+                                                        if (!(i < itemToProcess)) return [3 /*break*/, 7];
                                                         productName = products[i].NOME_PROD;
-                                                        if (!productName) return [3 /*break*/, 4];
+                                                        if (!productName) return [3 /*break*/, 6];
                                                         console.log("".concat(i + 1, " de ").concat(itemToProcess, " - Searching for ").concat(productName, " "));
-                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.BULA)];
+                                                        _c.label = 2;
                                                     case 2:
-                                                        bulaUrl = _b.sent();
-                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.FISPQ)];
+                                                        _c.trys.push([2, 5, , 6]);
+                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.BULA)];
                                                     case 3:
-                                                        fispqUrl = _b.sent();
+                                                        bulaUrl = _c.sent();
+                                                        return [4 /*yield*/, (0, services_1.getUrlFromDuckDuckGoSearch)(page, productName, DocumentType_1.DocumentType.FISPQ)];
+                                                    case 4:
+                                                        fispqUrl = _c.sent();
                                                         formatResult = {
                                                             cod: (_a = products[i]) === null || _a === void 0 ? void 0 : _a.COD_PROD,
                                                             name: productName,
@@ -99,16 +102,27 @@ var generateSearchJSON = function (products, isTest) { return __awaiter(void 0, 
                                                             fispqSearchResult: fispqUrl[0]
                                                         };
                                                         searchResults.push(formatResult);
-                                                        _b.label = 4;
-                                                    case 4:
+                                                        return [3 /*break*/, 6];
+                                                    case 5:
+                                                        err_1 = _c.sent();
+                                                        console.log("Something went while searching for ".concat(productName, ": "), err_1);
+                                                        formatResult = {
+                                                            cod: (_b = products[i]) === null || _b === void 0 ? void 0 : _b.COD_PROD,
+                                                            name: productName,
+                                                            bulaSearchResult: null,
+                                                            fispqSearchResult: null
+                                                        };
+                                                        searchResults.push(formatResult);
+                                                        return [3 /*break*/, 6];
+                                                    case 6:
                                                         i++;
                                                         return [3 /*break*/, 1];
-                                                    case 5: return [4 /*yield*/, (0, services_1.generateSearchResultJSON)(searchResults)];
-                                                    case 6:
-                                                        _b.sent();
+                                                    case 7: return [4 /*yield*/, (0, services_1.generateSearchResultJSON)(searchResults)];
+                                                    case 8:
+                                                        _c.sent();
                                                         return [4 /*yield*/, browser.close()];
-                                                    case 7:
-                                                        _b.sent();
+                                                    case 9:
+                                                        _c.sent();
                                                         return [2 /*return*/];
                                                 }
                                             });

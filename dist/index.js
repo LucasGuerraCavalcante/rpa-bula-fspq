@@ -74,7 +74,12 @@ var runBot = function () { return __awaiter(void 0, void 0, void 0, function () 
             case 7:
                 _a.sent();
                 _a.label = 8;
-            case 8: return [2 /*return*/];
+            case 8:
+                /* if (readlineSync.keyInYN('Mark downloaded PDFs as "ok"?: ')) {
+                  await bot.markOkDownloadedPDFs(isTest)
+                } */
+                process.exit(0);
+                return [2 /*return*/];
         }
     });
 }); };

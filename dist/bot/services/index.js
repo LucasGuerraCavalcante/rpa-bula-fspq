@@ -105,17 +105,19 @@ var downloadSearchResultPDF = function (searchResult, documentType) { return __a
         if (pdfURL && pdfURL.includes('.pdf')) {
             if (pdfURL.includes('https://')) {
                 return [2 /*return*/, new Promise(function (resolve) {
+                        console.log("Starting download for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
                         https_1.default.get(pdfURL, function (response) {
-                            resolve(response.pipe(fileStream));
+                            response.pipe(fileStream);
                         }).on('error', function (err) {
-                            console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err);
+                            resolve(console.log("Download failed for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name, ": "), err));
                         }).on('finish', function () {
-                            console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
+                            resolve(console.log("Download process finished for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name)));
                         });
                     })];
             }
             else {
                 return [2 /*return*/, new Promise(function (resolve) {
+                        console.log("Starting download for: ".concat(documentType, " ").concat(searchResult.cod, "  ").concat(searchResult.name));
                         http_1.default.get(pdfURL, function (response) {
                             resolve(response.pipe(fileStream));
                         }).on('error', function (err) {

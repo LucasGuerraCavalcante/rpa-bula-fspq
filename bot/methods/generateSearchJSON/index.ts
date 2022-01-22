@@ -40,17 +40,30 @@ export const generateSearchJSON = async (products: Product[], isTest: boolean | 
             if (productName) {
               console.log(`${i + 1} de ${itemToProcess} - Searching for ${productName} `)
 
-              const bulaUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.BULA)
-              const fispqUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.FISPQ)
+              try {
+                const bulaUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.BULA)
+                const fispqUrl = await getUrlFromDuckDuckGoSearch(page, productName, DocumentType.FISPQ)
 
-              const formatResult: SearchResult = {
-                cod: products[i]?.COD_PROD,
-                name: productName,
-                bulaSearchResult: bulaUrl[0],
-                fispqSearchResult: fispqUrl[0]
+                const formatResult: SearchResult = {
+                  cod: products[i]?.COD_PROD,
+                  name: productName,
+                  bulaSearchResult: bulaUrl[0],
+                  fispqSearchResult: fispqUrl[0]
+                }
+
+                searchResults.push(formatResult)
+              } catch (err) {
+                console.log(`Something went while searching for ${productName}: `, err)
+
+                const formatResult: SearchResult = {
+                  cod: products[i]?.COD_PROD,
+                  name: productName,
+                  bulaSearchResult: null,
+                  fispqSearchResult: null
+                }
+
+                searchResults.push(formatResult)
               }
-
-              searchResults.push(formatResult)
             }
           }
 
