@@ -1,32 +1,35 @@
 import fs from 'fs'
+/* import readlineSync from 'readline-sync' */
 
-import { PDFsFolderPath } from '../../../constants'
+import { bullsPath, fispqsPath } from '../../../constants'
+import { unlinkFile } from '../../services'
 
 export const deleteCorruptedFiles = async (isTest: boolean | string) => {
-  await fs.promises.readdir(PDFsFolderPath)
+  await readAndDeleteFiles(isTest, bullsPath)
+  await readAndDeleteFiles(isTest, fispqsPath)
+}
+
+const readAndDeleteFiles = async (isTest: boolean | string, path: string) => {
+  await fs.promises.readdir(path)
     .then(async (files) => {
-      const itemToProcess = isTest ? 6 : files.length
+      const itemToProcess = isTest ? 3 : files.length
 
       for (let i = 0; i < itemToProcess; i++) {
-        const file = files[i]
+        const fileName = files[i]
 
-        const stats = fs.statSync(`${PDFsFolderPath}/${file}`)
+        const stats = fs.statSync(`${path}/${fileName}`)
         const fileSizeInBytes = stats.size
 
-        if (fileSizeInBytes < 100000) {
-          console.error(`${file} has less than 1MB (${fileSizeInBytes}B) so its probably a corrupted file`)
+        if (fileSizeInBytes < 1000) {
+          console.error(`${fileName} has less than 1KB (${fileSizeInBytes}B) so its probably a corrupted file`)
 
-          await fs.promises.unlink(`${PDFsFolderPath}/${file}`)
-            .then(() => {
-              console.error(`${file} was deleted`)
-            })
-            .catch((err) => {
-              console.log(`Something went wrong while deleting ${file}`, err)
-            })
+          /* if (readlineSync.keyInYN('Do you want to delete it?: ')) { */
+          await unlinkFile(path, fileName)
+          /* } */
         }
       }
     })
     .catch((err) => {
-      console.error(`Could not list ${PDFsFolderPath}: `, err)
+      console.error(`Could not list ${path}: `, err)
     })
 }

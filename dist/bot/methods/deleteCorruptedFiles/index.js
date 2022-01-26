@@ -41,47 +41,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteCorruptedFiles = void 0;
 var fs_1 = __importDefault(require("fs"));
+/* import readlineSync from 'readline-sync' */
 var constants_1 = require("../../../constants");
+var services_1 = require("../../services");
 var deleteCorruptedFiles = function (isTest) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, fs_1.default.promises.readdir(constants_1.PDFsFolderPath)
+            case 0: return [4 /*yield*/, readAndDeleteFiles(isTest, constants_1.bullsPath)];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, readAndDeleteFiles(isTest, constants_1.fispqsPath)];
+            case 2:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.deleteCorruptedFiles = deleteCorruptedFiles;
+var readAndDeleteFiles = function (isTest, path) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, fs_1.default.promises.readdir(path)
                     .then(function (files) { return __awaiter(void 0, void 0, void 0, function () {
-                    var itemToProcess, _loop_1, i;
+                    var itemToProcess, i, fileName, stats, fileSizeInBytes;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                itemToProcess = isTest ? 6 : files.length;
-                                _loop_1 = function (i) {
-                                    var file, stats, fileSizeInBytes;
-                                    return __generator(this, function (_b) {
-                                        switch (_b.label) {
-                                            case 0:
-                                                file = files[i];
-                                                stats = fs_1.default.statSync("".concat(constants_1.PDFsFolderPath, "/").concat(file));
-                                                fileSizeInBytes = stats.size;
-                                                if (!(fileSizeInBytes < 100000)) return [3 /*break*/, 2];
-                                                console.error("".concat(file, " has less than 1MB (").concat(fileSizeInBytes, "B) so its probably a corrupted file"));
-                                                return [4 /*yield*/, fs_1.default.promises.unlink("".concat(constants_1.PDFsFolderPath, "/").concat(file))
-                                                        .then(function () {
-                                                        console.error("".concat(file, " was deleted"));
-                                                    })
-                                                        .catch(function (err) {
-                                                        console.log("Something went wrong while deleting ".concat(file), err);
-                                                    })];
-                                            case 1:
-                                                _b.sent();
-                                                _b.label = 2;
-                                            case 2: return [2 /*return*/];
-                                        }
-                                    });
-                                };
+                                itemToProcess = isTest ? 3 : files.length;
                                 i = 0;
                                 _a.label = 1;
                             case 1:
                                 if (!(i < itemToProcess)) return [3 /*break*/, 4];
-                                return [5 /*yield**/, _loop_1(i)];
+                                fileName = files[i];
+                                stats = fs_1.default.statSync("".concat(path, "/").concat(fileName));
+                                fileSizeInBytes = stats.size;
+                                if (!(fileSizeInBytes < 1000)) return [3 /*break*/, 3];
+                                console.error("".concat(fileName, " has less than 1KB (").concat(fileSizeInBytes, "B) so its probably a corrupted file"));
+                                /* if (readlineSync.keyInYN('Do you want to delete it?: ')) { */
+                                return [4 /*yield*/, (0, services_1.unlinkFile)(path, fileName)
+                                    /* } */
+                                ];
                             case 2:
+                                /* if (readlineSync.keyInYN('Do you want to delete it?: ')) { */
                                 _a.sent();
                                 _a.label = 3;
                             case 3:
@@ -92,7 +93,7 @@ var deleteCorruptedFiles = function (isTest) { return __awaiter(void 0, void 0, 
                     });
                 }); })
                     .catch(function (err) {
-                    console.error("Could not list ".concat(constants_1.PDFsFolderPath, ": "), err);
+                    console.error("Could not list ".concat(path, ": "), err);
                 })];
             case 1:
                 _a.sent();
@@ -100,4 +101,3 @@ var deleteCorruptedFiles = function (isTest) { return __awaiter(void 0, void 0, 
         }
     });
 }); };
-exports.deleteCorruptedFiles = deleteCorruptedFiles;

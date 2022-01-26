@@ -14,10 +14,18 @@ export const downloadSearchResultPDFs = async (isTest: boolean | string) => {
       const itemToProcess = isTest ? 3 : finalSearchResult.length
 
       for (let i = 0; i < itemToProcess; i++) {
-        const searchResult = finalSearchResult[i]
+        const searchResult = finalSearchResult[itemToProcess - (i + 1)]
 
-        await downloadSearchResultPDF(searchResult, DocumentType.BULA)
-        await downloadSearchResultPDF(searchResult, DocumentType.FISPQ)
+        try {
+          await downloadSearchResultPDF(searchResult, DocumentType.BULA)
+        } catch (err) {
+          console.log(`Download failed for: BULA ${searchResult.cod}  ${searchResult.name}`, err)
+        }
+        try {
+          await downloadSearchResultPDF(searchResult, DocumentType.FISPQ)
+        } catch (err) {
+          console.log(`Download failed for: FISPQ ${searchResult.cod}  ${searchResult.name}`, err)
+        }
       }
     })
     .catch((err) => {

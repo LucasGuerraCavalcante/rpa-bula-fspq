@@ -47,8 +47,8 @@ export const generateSearchJSON = async (products: Product[], isTest: boolean | 
                 const formatResult: SearchResult = {
                   cod: products[i]?.COD_PROD,
                   name: productName,
-                  bulaSearchResult: bulaUrl[0],
-                  fispqSearchResult: fispqUrl[0]
+                  bulaSearchResult: bulaUrl,
+                  fispqSearchResult: fispqUrl
                 }
 
                 searchResults.push(formatResult)

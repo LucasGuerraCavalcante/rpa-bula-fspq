@@ -39,27 +39,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.downloadSearchResultPDF = exports.generateSearchResultJSON = exports.getUrlFromDuckDuckGoSearch = void 0;
+exports.exportFile = exports.unlinkFile = exports.downloadSearchResultPDF = exports.generateSearchResultJSON = exports.getUrlFromDuckDuckGoSearch = void 0;
 var fs_1 = __importDefault(require("fs"));
 var http_1 = __importDefault(require("http"));
 var https_1 = __importDefault(require("https"));
 var DocumentType_1 = require("../../models/DocumentType");
-var constants_1 = require("../../constants");
 var selectToWait = '.result__body';
 var selectorResult = 'a[data-testid="result-title-a"]';
 var getUrlFromDuckDuckGoSearch = function (page, productName, documentToSearch) { return __awaiter(void 0, void 0, void 0, function () {
-    var formatedName, searchUrl, err_1, resultURL;
+    var formatedName, searchUrl, err_1, scrappedURLs, resultURL;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 formatedName = productName.replace(' ', '+');
                 searchUrl = "https://duckduckgo.com/?q=".concat(formatedName, "+").concat(documentToSearch, "+pdf&kl=br-pt&k1=-1");
-                return [4 /*yield*/, page.goto(searchUrl)];
+                _a.label = 1;
             case 1:
-                _a.sent();
-                _a.label = 2;
+                _a.trys.push([1, 4, , 7]);
+                return [4 /*yield*/, page.goto(searchUrl)];
             case 2:
-                _a.trys.push([2, 4, , 7]);
+                _a.sent();
                 return [4 /*yield*/, page.waitForSelector(selectToWait, { visible: true })];
             case 3:
                 _a.sent();
@@ -76,7 +75,8 @@ var getUrlFromDuckDuckGoSearch = function (page, productName, documentToSearch) 
                 return [3 /*break*/, 7];
             case 7: return [4 /*yield*/, page.$$eval(selectorResult, function (as) { return as.map(function (a) { return a.getAttribute('href'); }); })];
             case 8:
-                resultURL = _a.sent();
+                scrappedURLs = _a.sent();
+                resultURL = scrappedURLs.filter(function (url) { return url === null || url === void 0 ? void 0 : url.includes('.pdf'); })[0];
                 return [2 /*return*/, resultURL];
         }
     });
@@ -101,7 +101,7 @@ var downloadSearchResultPDF = function (searchResult, documentType) { return __a
     return __generator(this, function (_a) {
         fileName = documentType === DocumentType_1.DocumentType.BULA ? "".concat(searchResult.cod, "_1.pdf") : "".concat(searchResult.cod, "_2.pdf");
         pdfURL = documentType === DocumentType_1.DocumentType.BULA ? searchResult.bulaSearchResult : searchResult.fispqSearchResult;
-        fileStream = fs_1.default.createWriteStream("".concat(constants_1.PDFsFolderPath, "/").concat(fileName));
+        fileStream = fs_1.default.createWriteStream(documentType === DocumentType_1.DocumentType.BULA ? "./data/bulas/".concat(fileName) : "./data/fispqs/".concat(fileName));
         if (pdfURL && pdfURL.includes('.pdf')) {
             if (pdfURL.includes('https://')) {
                 return [2 /*return*/, new Promise(function (resolve) {
@@ -135,3 +135,41 @@ var downloadSearchResultPDF = function (searchResult, documentType) { return __a
     });
 }); };
 exports.downloadSearchResultPDF = downloadSearchResultPDF;
+var unlinkFile = function (path, fileName) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, fs_1.default.promises.unlink("".concat(path, "/").concat(fileName))
+                    .then(function () {
+                    console.error("".concat(fileName, " was deleted"));
+                })
+                    .catch(function (err) {
+                    console.log("Something went wrong while deleting ".concat(fileName), err);
+                })];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.unlinkFile = unlinkFile;
+var exportFile = function (directory, archive, output, fileExtension) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                console.log("Creating the .".concat(fileExtension, " file..."));
+                archive.pipe(output);
+                return [4 /*yield*/, archive
+                        .directory(directory, '')
+                        .finalize()
+                        .then(function () {
+                        console.log("Files exported on ".concat(directory, ".").concat(fileExtension));
+                    }).catch(function (err) {
+                        console.log("Something went wrong while creating the ".concat(fileExtension, " file"), err);
+                    })];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };
+exports.exportFile = exportFile;

@@ -98,8 +98,8 @@ var generateSearchJSON = function (products, isTest) { return __awaiter(void 0, 
                                                         formatResult = {
                                                             cod: (_a = products[i]) === null || _a === void 0 ? void 0 : _a.COD_PROD,
                                                             name: productName,
-                                                            bulaSearchResult: bulaUrl[0],
-                                                            fispqSearchResult: fispqUrl[0]
+                                                            bulaSearchResult: bulaUrl,
+                                                            fispqSearchResult: fispqUrl
                                                         };
                                                         searchResults.push(formatResult);
                                                         return [3 /*break*/, 6];

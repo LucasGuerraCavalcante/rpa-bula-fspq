@@ -2,10 +2,10 @@ import puppeteer from 'puppeteer'
 import fs from 'fs'
 import http from 'http'
 import https from 'https'
+import archiver from 'archiver'
 
 import { DocumentType } from '../../models/DocumentType'
 import { SearchResult } from '../../models/SearchResult'
-import { PDFsFolderPath } from '../../constants'
 
 const selectToWait = '.result__body'
 const selectorResult = 'a[data-testid="result-title-a"]'
@@ -14,9 +14,8 @@ export const getUrlFromDuckDuckGoSearch = async (page: puppeteer.Page, productNa
   const formatedName = productName.replace(' ', '+')
   const searchUrl = `https://duckduckgo.com/?q=${formatedName}+${documentToSearch}+pdf&kl=br-pt&k1=-1`
 
-  await page.goto(searchUrl)
-
   try {
+    await page.goto(searchUrl)
     await page.waitForSelector(selectToWait, { visible: true })
   } catch (err) {
     console.log(`Something went wrong while acessing ${searchUrl}: .`, err)
@@ -24,7 +23,8 @@ export const getUrlFromDuckDuckGoSearch = async (page: puppeteer.Page, productNa
     await page.waitForSelector(selectToWait, { visible: true })
   }
 
-  const resultURL = await page.$$eval(selectorResult, (as: Element[]) => as.map(a => a.getAttribute('href')))
+  const scrappedURLs = await page.$$eval(selectorResult, (as: Element[]) => as.map(a => a.getAttribute('href')))
+  const resultURL = scrappedURLs.filter(url => url?.includes('.pdf'))[0]
 
   return resultURL
 }
@@ -44,7 +44,7 @@ export const downloadSearchResultPDF = async (searchResult: SearchResult, docume
   const fileName = documentType === DocumentType.BULA ? `${searchResult.cod}_1.pdf` : `${searchResult.cod}_2.pdf`
   const pdfURL = documentType === DocumentType.BULA ? searchResult.bulaSearchResult : searchResult.fispqSearchResult
 
-  const fileStream = fs.createWriteStream(`${PDFsFolderPath}/${fileName}`)
+  const fileStream = fs.createWriteStream(documentType === DocumentType.BULA ? `./data/bulas/${fileName}` : `./data/fispqs/${fileName}`)
 
   if (pdfURL && pdfURL.includes('.pdf')) {
     if (pdfURL.includes('https://')) {
@@ -75,4 +75,28 @@ export const downloadSearchResultPDF = async (searchResult: SearchResult, docume
   } else {
     console.log(`Cannot download PDF for ${searchResult.name}: ${documentType} .pdf URL is not available`)
   }
+}
+
+export const unlinkFile = async (path: string, fileName: string) => {
+  await fs.promises.unlink(`${path}/${fileName}`)
+    .then(() => {
+      console.error(`${fileName} was deleted`)
+    })
+    .catch((err) => {
+      console.log(`Something went wrong while deleting ${fileName}`, err)
+    })
+}
+
+export const exportFile = async (directory: string, archive: archiver.Archiver, output: fs.WriteStream, fileExtension: string) => {
+  console.log(`Creating the .${fileExtension} file...`)
+  archive.pipe(output)
+
+  await archive
+    .directory(directory, '')
+    .finalize()
+    .then(() => {
+      console.log(`Files exported on ${directory}.${fileExtension}`)
+    }).catch((err) => {
+      console.log(`Something went wrong while creating the ${fileExtension} file`, err)
+    })
 }

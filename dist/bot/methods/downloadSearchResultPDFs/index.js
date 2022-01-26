@@ -48,7 +48,7 @@ var downloadSearchResultPDFs = function (isTest) { return __awaiter(void 0, void
         switch (_a.label) {
             case 0: return [4 /*yield*/, fs_1.default.promises.readFile('./searchResult.json', 'utf8')
                     .then(function (data) { return __awaiter(void 0, void 0, void 0, function () {
-                    var dataset, finalSearchResult, itemToProcess, i, searchResult;
+                    var dataset, finalSearchResult, itemToProcess, i, searchResult, err_1, err_2;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -58,19 +58,33 @@ var downloadSearchResultPDFs = function (isTest) { return __awaiter(void 0, void
                                 i = 0;
                                 _a.label = 1;
                             case 1:
-                                if (!(i < itemToProcess)) return [3 /*break*/, 5];
-                                searchResult = finalSearchResult[i];
-                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
+                                if (!(i < itemToProcess)) return [3 /*break*/, 9];
+                                searchResult = finalSearchResult[itemToProcess - (i + 1)];
+                                _a.label = 2;
                             case 2:
-                                _a.sent();
-                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
+                                _a.trys.push([2, 4, , 5]);
+                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.BULA)];
                             case 3:
                                 _a.sent();
-                                _a.label = 4;
+                                return [3 /*break*/, 5];
                             case 4:
+                                err_1 = _a.sent();
+                                console.log("Download failed for: BULA ".concat(searchResult.cod, "  ").concat(searchResult.name), err_1);
+                                return [3 /*break*/, 5];
+                            case 5:
+                                _a.trys.push([5, 7, , 8]);
+                                return [4 /*yield*/, (0, services_1.downloadSearchResultPDF)(searchResult, DocumentType_1.DocumentType.FISPQ)];
+                            case 6:
+                                _a.sent();
+                                return [3 /*break*/, 8];
+                            case 7:
+                                err_2 = _a.sent();
+                                console.log("Download failed for: FISPQ ".concat(searchResult.cod, "  ").concat(searchResult.name), err_2);
+                                return [3 /*break*/, 8];
+                            case 8:
                                 i++;
                                 return [3 /*break*/, 1];
-                            case 5: return [2 /*return*/];
+                            case 9: return [2 /*return*/];
                         }
                     });
                 }); })

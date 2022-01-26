@@ -42,27 +42,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.exportDownloadedFiles = void 0;
 var fs_1 = __importDefault(require("fs"));
 var archiver_1 = __importDefault(require("archiver"));
+var services_1 = require("../../services");
 var constants_1 = require("../../../constants");
+var fileExtension = 'zip';
 var exportDownloadedFiles = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var archive, output;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                archive = archiver_1.default.create('zip', {});
-                output = fs_1.default.createWriteStream('./data/pdfs.zip');
-                archive.pipe(output);
-                return [4 /*yield*/, archive
-                        .directory(constants_1.PDFsFolderPath, '')
-                        .finalize()
-                        .then(function () {
-                        console.log('Files exported on ./data/pdfs.zip');
-                    }).catch(function (err) {
-                        console.log('Something went wrong while creating the zip file', err);
-                    })];
+            case 0: return [4 /*yield*/, writeAndExportFiles(constants_1.bullsPath)];
             case 1:
+                _a.sent();
+                return [4 /*yield*/, writeAndExportFiles(constants_1.fispqsPath)];
+            case 2:
                 _a.sent();
                 return [2 /*return*/];
         }
     });
 }); };
 exports.exportDownloadedFiles = exportDownloadedFiles;
+var writeAndExportFiles = function (path) { return __awaiter(void 0, void 0, void 0, function () {
+    var archive, output;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                archive = archiver_1.default.create(fileExtension, {});
+                output = fs_1.default.createWriteStream("".concat(path, ".").concat(fileExtension));
+                return [4 /*yield*/, (0, services_1.exportFile)(path, archive, output, fileExtension)];
+            case 1:
+                _a.sent();
+                return [2 /*return*/];
+        }
+    });
+}); };

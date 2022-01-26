@@ -1,20 +1,19 @@
 import fs from 'fs'
 import archiver from 'archiver'
 
-import { PDFsFolderPath } from '../../../constants'
+import { exportFile } from '../../services'
+import { bullsPath, fispqsPath } from '../../../constants'
+
+const fileExtension = 'zip'
 
 export const exportDownloadedFiles = async () => {
-  const archive = archiver.create('zip', {})
-  const output = fs.createWriteStream('./data/pdfs.zip')
+  await writeAndExportFiles(bullsPath)
+  await writeAndExportFiles(fispqsPath)
+}
 
-  archive.pipe(output)
+const writeAndExportFiles = async (path: string) => {
+  const archive = archiver.create(fileExtension, {})
+  const output = fs.createWriteStream(`${path}.${fileExtension}`)
 
-  await archive
-    .directory(PDFsFolderPath, '')
-    .finalize()
-    .then(() => {
-      console.log('Files exported on ./data/pdfs.zip')
-    }).catch((err) => {
-      console.log('Something went wrong while creating the zip file', err)
-    })
+  await exportFile(path, archive, output, fileExtension)
 }
