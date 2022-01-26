@@ -32,7 +32,7 @@ export const getUrlFromDuckDuckGoSearch = async (page: puppeteer.Page, productNa
 export const generateSearchResultJSON = async (finalSearchResult: SearchResult[]) => {
   const finalDataResult = JSON.stringify({ finalSearchResult: finalSearchResult })
 
-  fs.writeFile('searchResult.json', finalDataResult, (err: any) => {
+  fs.writeFile('.data/searchResult.json', finalDataResult, (err: any) => {
     if (err) {
       console.log('Something went wrong while writing the JSON result file.', err)
     }
